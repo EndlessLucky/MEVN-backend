@@ -26,9 +26,8 @@ app.get('/posts', (req, res) => {
         })
     }).sort({_id:-1})
 });
-//Add new post
+// Add new post
 app.post('/posts', (req, res) =>{
-    var db = req.db;
     var title = req.body.title;
     var description = req.body.description;
     var new_post = new Post({
@@ -46,5 +45,44 @@ app.post('/posts', (req, res) =>{
         })
     })
 })
-
+// Fetch single post
+app.get('/post/:id', (req,res) => {
+    Post.findById(req.params.id, 'title description', function(error, post){
+        if (error) {
+            console.error(error);
+        }
+        res.send(post);
+    })
+})
+//Update a post
+app.put('/posts/:id', (req,res) => {
+    Post.findById(req.params.id, 'title description', function(error, post){
+        if (error) {
+            console.error(error);
+        }
+        post.title = req.body.title;
+        post.description = req.body.description;
+        post.save(function (error) {
+            if (error) {
+                console.log(error);
+            }
+            res.send({
+                success: true
+            })
+        })
+    })
+})
+//Delete a post
+app.delete('/posts/:id', (req,res) => {
+    Post.remove({
+        _id: req.params.id
+    }, function(err, post){
+        if (err){
+            res.send(err)
+        }
+        res.send({
+            success: true
+        })
+    })
+})
 app.listen(process.env.PORT || 8081);
